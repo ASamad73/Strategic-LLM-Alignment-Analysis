@@ -14,9 +14,6 @@ This repository provides a focused, reproducible research framework investigatin
 2. **Preference Alignment**: Implementation and evaluation of **Direct Preference Optimization (DPO)** using **PEFT/LoRA** adapters, alongside a comparative stability analysis of **Group Relative Policy Optimization (GRPO)**.
 3. **Mechanistic Interpretability**: **Universal Sparse Autoencoder (USAE)** experiments to probe shared internal features across model families and test the "Platonic Representation Hypothesis."
 
-> [!NOTE]
-> This was a group project executed for an Advanced Machine Learning course. The full ICML-style technical report is available in `docs/Technical_Project_Report.pdf`.
-
 ---
 
 ## 🧑‍💻 My Contributions (Abdul Samad)
@@ -26,7 +23,7 @@ I led the **Decoding Dynamics** and **DPO Alignment** modules. My contributions 
 * **DPO — PEFT / LoRA ** (dpo_alignment_analysis.ipynb)**: Orchestrated the DPO training pipeline using **LoRA adapters** ($r=8, \alpha=16$). I was responsible for computing perplexity shifts, mean token KL-divergence, and conducting robustness/reward-hacking stress tests.
 * **Report & Figures**: Co-authored the technical report and prepared all figures and data visualizations associated with my contributions above.
 
-*Team members handled GRPO stability experiments and SAE interpretability. See the [Authorship](#-authorship--contributions-transparent) section below for a full breakdown.*
+*Team members handled GRPO stability experiments and SAE interpretability. See the [Contributions] section at the end for more details.*
 
 ---
 
@@ -80,12 +77,22 @@ src/
 └── README.md
 ```
 
-### ⚠ Limitations & Reproducibility
-**Model Scale:** Experiments used SmolLM2-135M-SFT due to compute constraints.
-**GRPO Sensitivity:** Observed instability is highly dependent on hyperparameters and group sizes.
-**Reproducibility:** Saved checkpoints and logs are included to allow for figure reproduction without full retraining.
+---
 
-### Contributions (Transparent)
+### ⚠ Limitations & Reproducibility
+
+* **Model Scale:** Experiments used SmolLM2-135M-SFT due to compute constraints.
+* **GRPO Sensitivity:** Observed instability is highly dependent on hyperparameters and group sizes.
+* **Reproducibility:** Saved checkpoints and logs are included to allow for figure reproduction without full retraining.
+
+---
+
+### 🤝 Team Roles & Contributions
+* **Abdul Samad (ASamad73):** Lead LLM Decoding Dynamics and Direct Preference Optimization. Implemented the generation pipelines for all four decoding strategies and orchestrated the DPO alignment suite using LoRA adapters.
 * **Hamza Habib:** GRPO implementation, stability diagnostics, and benchmarking.
 * **Rumaan Mujtaba:** UAE implementation and mechanistic interpretability visualizations.
-**Collective:** Co-authored the ICML-style Technical Report with Hamza Habib and Rumaan Mujtaba
+* **Collective:** Co-authored the ICML-style Technical Report with Hamza Habib and Rumaan Mujtaba
+
+---
+
+⭐️ If you find this research useful, please consider giving the repository a star!

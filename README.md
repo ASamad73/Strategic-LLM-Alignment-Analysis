@@ -1,80 +1,91 @@
 <h1 align="center">🧠 LLM Decoding Dynamics & Preference Alignment 🤖</h1>
+
 <p align="center">
   <b>Comparative Analysis of Generation Strategies & DPO-based Policy Alignment</b><br>
-  <i>A Research Framework for Investigating Diversity-Quality Trade-offs and Alignment Stability</i>
+  <i>A Research Framework for Investigating Diversity–Quality Trade-offs and Alignment Stability</i>
 </p>
 
 ---
 
 ## 📌 Project Overview
+This repository provides a focused, reproducible research framework investigating the post-training lifecycle of Large Language Models (LLMs). Our research focuses on three primary pillars:
 
-This project provides a rigorous technical exploration into the post-training lifecycle of Large Language Models (LLMs). We investigate how specific **Decoding Strategies** influence lexical diversity and how **Direct Preference Optimization (DPO)** can align model behavior with human preferences while minimizing the "Alignment Tax."
+1. **Decoding Dynamics**: Empirical benchmarking of **Greedy, Beam, Top-K, and Top-P** sampling with temperature sweeps to quantify the trade-off between generation quality and lexical diversity.
+2. **Preference Alignment**: Implementation and evaluation of **Direct Preference Optimization (DPO)** using **PEFT/LoRA** adapters, alongside a comparative stability analysis of **Group Relative Policy Optimization (GRPO)**.
+3. **Mechanistic Interpretability**: **Universal Sparse Autoencoder (USAE)** experiments to probe shared internal features across model families and test the "Platonic Representation Hypothesis."
 
-The research is divided into three core pillars:
-1. **Decoding Dynamics**: Benchmarking Greedy, Beam Search, Top-K, and Top-P strategies.
-2. **Preference Alignment**: Implementing and evaluating **DPO** and **GRPO** for robust policy refinement.
-3. **Mechanistic Interpretability**: Using **Universal Sparse Autoencoders (USAEs)** to test the Platonic Representation Hypothesis.
+> [!NOTE]
+> This was a group project executed for an Advanced Machine Learning course. The full ICML-style technical report is available in `docs/Technical_Project_Report.pdf`.
 
 ---
 
-## 🧑‍💻 My Contributions
+## 🧑‍💻 My Contributions (Abdul Samad)
+I led the **Decoding Dynamics** and **DPO Alignment** modules. My contributions included end-to-end implementation, empirical analysis, and technical writing:
 
-In this collaborative research effort, I served as the **Lead Researcher for Decoding Dynamics and DPO Implementation**. My specific technical contributions included:
+* **Decoding Dynamics (llm_decoding_strategies.ipynb)**: Full implementation of generation pipelines for all four decoding strategies. I designed the evaluation suite (using **Distinct-N** and reward vs. diversity metrics) and authored the core analysis notebooks and visualization plots.
+* **DPO — PEFT / LoRA ** (dpo_alignment_analysis.ipynb)**: Orchestrated the DPO training pipeline using **LoRA adapters** ($r=8, \alpha=16$). I was responsible for computing perplexity shifts, mean token KL-divergence, and conducting robustness/reward-hacking stress tests.
+* **Report & Figures**: Co-authored the technical report and prepared all figures and data visualizations associated with my contributions above.
 
-- **End-to-End Implementation of Task 1**: Developed the sequential generation loops for all four decoding strategies and designed the evaluation suite for $Distinct-N$ diversity metrics.
-- **DPO Pipeline Orchestration (Task 2)**: Integrated **LoRA (Low-Rank Adaptation)** for parameter-efficient alignment of the `SmolLM2-135M` model. 
-- **Robustness Analysis**: Conducted the empirical study on **Catastrophic Forgetting** and **Verbosity Bias**, specifically calculating the KL-Divergence and Perplexity shifts for the DPO-aligned policy.
+*Team members handled GRPO stability experiments and SAE interpretability. See the [Authorship](#-authorship--contributions-transparent) section below for a full breakdown.*
 
 ---
 
 ## 🧠 Architecture & Methodology
 
+
+
 ### 🔹 Module 1: Decoding Strategy Analysis
-We analyzed the trade-offs between **Search-based** (Greedy, Beam) and **Sampling-based** (Top-K, Top-P) methods.
-- **Objective**: Balance generation quality (Perplexity) with lexical variety ($Distinct-1/2/3$).
-- **Key Insight**: Top-P (Nucleus) sampling consistently outperformed Top-K by dynamically adjusting the sampling pool based on the cumulative probability mass, preventing "boring" or repetitive loops common in Beam Search.
+* **Goal**: Quantify the quality–diversity tradeoff across decoding modes and temperatures.
+* **Approach**: Generated outputs using multiple modes, computing **Distinct-1/2/3**, reward scores (via a reference reward model), and plotting reward vs. diversity frontiers.
+* **Key Insight**: **Top-P (nucleus) sampling** adapts the candidate set dynamically and consistently offers a superior reward–diversity frontier than fixed Top-K at comparable temperatures.
+
+### 🔹 Module 2: Preference Alignment (DPO vs GRPO)
+* **Goal**: Align model outputs to human preferences while measuring the “Alignment Tax” (e.g., change in perplexity/KL) and robustness.
+* **Approach**: Implemented **DPO using PEFT/LoRA** to avoid expensive full-model fine-tuning. Compared results against **GRPO** as a baseline to record instability modes.
+* **Key Insight**: DPO + LoRA yields stable aligned policies with a modest alignment tax ($KL \approx 0.016$). Conversely, GRPO exhibited severe instability and mode collapse under several hyperparameter regimes.
+
+### 🔹 Module 3: Mechanistic Interpretability (USAE)
+* **Goal**: Test whether different architectures share universal high-level features (Partial Platonic Hypothesis).
+* **Approach**: Trained a **Universal Sparse Autoencoder** on activations from ResNet and ViT, measuring cross-reconstruction $R^2$ and feature co-firing statistics.
+* **Key Insight**: Evidence supports partial universality—shared semantic features exist but come with a measurable alignment cost.
 
 
 
 ---
 
-### 🔹 Module 2: LLM Alignment (DPO vs. GRPO)
-Using the `orca_dpo_pairs` dataset, we optimized a Supervised Fine-Tuned (SFT) model using Direct Preference Optimization.
-- **Optimization Strategy**: Utilized LoRA ($r=8, \alpha=16$) to fine-tune only the Query/Value projections, significantly reducing the compute footprint.
-- **Comparison**: While **GRPO** showed signs of mode collapse and reward hacking, **DPO** remained stable, effectively increasing the likelihood of preferred responses without significantly degrading general language capabilities.
+## 📊 Quantitative Summary (from the Report)
 
-
-
----
-
-### 🔹 Module 3: Mechanistic Interpretability (USAEs)
-We investigated the **Platonic Representation Hypothesis** by training Universal Sparse Autoencoders.
-- **Goal**: Align the internal feature spaces of different architectures (ResNet vs. ViT).
-- **Finding**: Despite different structural priors, both models converged toward a shared semantic "Platonic" space, though alignment accuracy was inversely correlated with reconstruction loss.
+| Component | Notable Metric(s) | Key Takeaway |
+| :--- | :--- | :--- |
+| **Top-P vs Top-K** | Reward-Diversity Frontier | Top-P offers superior dynamic adaptation |
+| **DPO (LoRA)** | Perplexity: **~11.00**; Mean KL: **~0.016** | Controlled verbosity; stable alignment |
+| **GRPO** | Perplexity: **~48.13** (Failure runs) | Observed high instability and mode collapse |
+| **USAE** | Cross-reconstruction $R^2$: **0.62–0.72** | Alignment tax ≈ 5% reduction in $R^2$ |
 
 ---
 
-## 📊 Results Summary
+## 📂 Repository Structure
 
-| Strategy/Method | Perplexity ($\downarrow$) | $Distinct-3$ ($\uparrow$) | KL-Div ($\approx 0$) | Status |
-|-----------------|---------------------------|----------------------------|-----------------------|--------|
-| **SFT (Baseline)** | 10.23 | 0.84 | 0.00 | Reference |
-| **Top-P (p=0.9)** | 10.55 | **0.91** | - | Best Diversity |
-| **DPO Alignment** | **11.00** | 0.87 | **0.016** | **Stable Alignment** |
-| **GRPO Alignment**| 14.20 | 0.72 | 0.082 | Mode Collapse |
-
----
-
-## 📂 Project Structure
 ```text
-llm-decoding-preference-alignment/
-├── Task1_Decoding/
-│   └── llm_decoding_strategies_and_diversity_metrics.py  # Implementation of Search/Sampling
-├── Task2_Alignment/
-│   ├── dpo_alignment_pipeline.py                         # My DPO & Robustness Implementation
-│   └── grpo_analysis_baseline.py                         # GRPO Comparative Baseline
-├── Task3_Interpretability/
-│   └── universal_sae_alignment.py                        # USAE & Feature Correlation
+src/
+├── Decoding/
+│   └── llm_decoding_strategies.py                 # Task 1 Implementation
+├── Alignment/
+│   ├── dpo_alignment_analysis.py                  # Task 2 (My Implementation)
+│   └── grpo_alignment_and_stability_analysis.py   # Task 2 (Baseline)
+├── Interpretability/
+│   └── sae_cross_model_alignment.py               # Task 3 Implementation
 ├── docs/
-│   └── Technical_Project_Report.pdf                      # Comprehensive ICML-style Paper
+│   └── Technical_Project_Report.pdf               # Full Research Paper
 └── README.md
+```
+
+### ⚠ Limitations & Reproducibility
+**Model Scale:** Experiments used SmolLM2-135M-SFT due to compute constraints.
+**GRPO Sensitivity:** Observed instability is highly dependent on hyperparameters and group sizes.
+**Reproducibility:** Saved checkpoints and logs are included to allow for figure reproduction without full retraining.
+
+### Contributions (Transparent)
+* **Hamza Habib:** GRPO implementation, stability diagnostics, and benchmarking.
+* **Rumaan Mujtaba:** UAE implementation and mechanistic interpretability visualizations.
+**Collective:** Co-authored the ICML-style Technical Report with Hamza Habib and Rumaan Mujtaba

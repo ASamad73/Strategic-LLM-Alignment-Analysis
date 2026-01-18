@@ -95,4 +95,10 @@ src/
 
 ---
 
+## 📄 Reference
+
+The research work and detailed metrics are documented in our [📄 Research Paper](./docs/Technical_Project_Report.pdf).
+
+---
+
 ⭐️ If you find this research useful, please consider giving the repository a star!
